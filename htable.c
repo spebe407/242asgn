@@ -79,9 +79,23 @@ void htable_print(htable h, FILE *stream) {
     }
 }
 
+
 void htable_print_entire_table(htable h) {
-    
+    int count = 0;
+    for(count = 0; count < h-> capacity; count ++){
+        if(h->keys [count] != NULL){
+            fprintf(stdout, "\%5d \%5d \%5d   \%s\n",
+                    count,
+                    h->frequencies[count],
+                    h-> stats,
+                    h->keys[count]);
+        } /* else { */
+        /*     fprintf(stream,"\%5d \%5d \%5d   \%s",count,); */
+        /* } */
+    }
 }
+
+                
 
 int htable_search(htable h, char *str) {
     int collisions = 0;
@@ -113,36 +127,6 @@ static unsigned int htable_word_to_int(char *word) {
 
 static unsigned int htable_step(htable h, unsigned int i_key) {
     return 1 + (i_key % (h->capacity - 1));
-}
-
-/**
- * Prints out a table showing what the following attributes were like
- * at regular intervals (as determined by num_stats) while the
- * hashtable was being built.
- *
- * @li Percent At Home - how many keys were placed without a collision
- * occurring.
- * @li Average Collisions - how many collisions have occurred on
- *  average while placing all of the keys so far.
- * @li Maximum Collisions - the most collisions that have occurred
- * while placing a key.
- *
- * @param h the hashtable to print statistics summary from.
- * @param stream the stream to send output to.
- * @param num_stats the maximum number of statistical snapshots to print.
- */
-void htable_print_stats(htable h, FILE *stream, int num_stats) {
-    int i;
-
-    fprintf(stream, "\n%s\n\n", 
-            h->method == LINEAR_P ? "Linear Probing" : "Double Hashing"); 
-    fprintf(stream, "Percent   Current    Percent    Average      Maximum\n");
-    fprintf(stream, " Full     Entries    At Home   Collisions   Collisions\n");
-    fprintf(stream, "------------------------------------------------------\n");
-    for (i = 1; i <= num_stats; i++) {
-        print_stats_line(h, stream, 100 * i / num_stats);
-    }
-    fprintf(stream, "------------------------------------------------------\n\n");
 }
 
 /**
@@ -179,6 +163,37 @@ static void print_stats_line(htable h, FILE *stream, int percent_full) {
     }
 }
 
+
+/**
+ * Prints out a table showing what the following attributes were like
+ * at regular intervals (as determined by num_stats) while the
+ * hashtable was being built.
+ *
+ * @li Percent At Home - how many keys were placed without a collision
+ * occurring.
+ * @li Average Collisions - how many collisions have occurred on
+ *  average while placing all of the keys so far.
+ * @li Maximum Collisions - the most collisions that have occurred
+ * while placing a key.
+ *
+ * @param h the hashtable to print statistics summary from.
+ * @param stream the stream to send output to.
+ * @param num_stats the maximum number of statistical snapshots to print.
+ */
+void htable_print_stats(htable h, FILE *stream, int num_stats) {
+    int i;
+
+    fprintf(stream, "\n%s\n\n", 
+            h->method == LINEAR_P ? "Linear Probing" : "Double Hashing"); 
+    fprintf(stream, "Percent   Current    Percent    Average      Maximum\n");
+    fprintf(stream, " Full     Entries    At Home   Collisions   Collisions\n");
+    fprintf(stream, "------------------------------------------------------\n");
+    for (i = 1; i <= num_stats; i++) {
+        print_stats_line(h, stream, 100 * i / num_stats);
+    }
+    fprintf(stream, "------------------------------------------------------\n\n");
+}
+
 /*int main(void) {
   htable h = htable_new(18143);
   char word[256];
@@ -186,7 +201,6 @@ static void print_stats_line(htable h, FILE *stream, int percent_full) {
   int insertions = 0;
   while (getword(word, sizeof word, stdin) != EOF) {
   htable_insert(h, word);
-
   insertions++;
   }
     

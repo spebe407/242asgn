@@ -2,7 +2,7 @@
 #define HTABLE_H_
 
 #include <stdio.h>
-typedef enum hashing_e { LINEAR_P, DOUBLE_H } hashing_t; //Use Linear Probing or Double Hashing
+typedef enum hashing_e { LINEAR_P, DOUBLE_H } hashing_t; /*Use Linear Probing or Double Hashing*/
 typedef struct htablerec *htable;
 extern void htable_free(htable h);
 extern int htable_insert(htable h, char *str);

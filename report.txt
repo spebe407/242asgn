@@ -1,18 +1,21 @@
-Name: 
-Student ID: 
-Group No: 
+Name: Makayla Montgomery
+Student ID: 3881679
+Group No: 39
 
 My contributions to the assignment
-Effort: 
-Usefulness: 
+Effort: minimal but did support 
+Usefulness: Oraginised meet ups to dicuss the assignment
+have low understanding of requirements 
 
-The contributions of _______________
-Effort: 
-Usefulness: 
+The contributions of Ben Spencer
+Effort: High
+Usefulness:
+Started the project and hosted it on git hub 
 
-The contributions of _______________
-Effort: 
-Usefulness: 
+The contributions of Spring Han 
+Effort: Unknown 
+Usefulness: Only contactable via email
 
 My thoughts on the positives and negatives of working in a group.
 
+Difficult assignment to get my head around. Am getting there slowly 
