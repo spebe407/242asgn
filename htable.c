@@ -13,8 +13,24 @@ struct htablerec {
     hashing_t method;
 };
 
+static unsigned int htable_word_to_int(char *word) {
+    unsigned int result = 0;
+    
+    while (*word != '\0') {
+        result = (*word++ + 31 * result);   
+    }
+
+    return result;
+}
+
+static unsigned int htable_step(htable h, unsigned int i_key) {
+    unsigned int result = 1 + (i_key % (h->capacity - 1));
+    return result;
+}
+
 void htable_free(htable h) {
-    for(int i = 0; i < h->capacity; i++) {
+    int i;
+    for(i = 0; i < h->capacity; i++) {
         if(h->keys[i] != NULL) { 
             free(h->keys[i]);
         }
@@ -32,7 +48,7 @@ int htable_insert(htable h, char *str) {
     unsigned int index = key % h->capacity;
     unsigned int step = (h->method == LINEAR_P) ? 1 : htable_step(h, key);
 
-    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != h->capacity) {
+    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != (unsigned)h->capacity) {
         index = (index + step) % h->capacity;
         collisions++;
     }
@@ -55,6 +71,7 @@ int htable_insert(htable h, char *str) {
 }
 
 htable htable_new(int capacity, hashing_t h_type) {
+    int i;
     htable result = emalloc(sizeof *result);
     result->capacity = capacity;
     result->num_keys = 0;
@@ -62,8 +79,8 @@ htable htable_new(int capacity, hashing_t h_type) {
     result->frequencies = emalloc(result->capacity * sizeof(result->frequencies[0]));
     result->keys = emalloc(result->capacity * sizeof(result->keys[0]));
     result->stats = emalloc(result->capacity * sizeof(result->stats[0]));
-
-    for(int i = 0; i < result->capacity; i++) {
+    
+    for(i = 0; i < result->capacity; i++) {
         result->frequencies[i] = 0;
         result->keys[i] = NULL;
     }
@@ -72,7 +89,8 @@ htable htable_new(int capacity, hashing_t h_type) {
 }
 
 void htable_print(htable h, FILE *stream) {
-    for(int i = 0; i < h->capacity; i++) {
+    int i;
+    for(i = 0; i < h->capacity; i++) {
         if(h->keys[i] != NULL) {
             printf("%d %s\n", h->frequencies[i], h->keys[i]);
         }
@@ -82,16 +100,22 @@ void htable_print(htable h, FILE *stream) {
 
 void htable_print_entire_table(htable h) {
     int count = 0;
+
+    fprintf(stderr, "  Pos  Freq  Stats  Word\n");
+    fprintf(stderr, "----------------------------------------\n");
     for(count = 0; count < h-> capacity; count ++){
         if(h->keys [count] != NULL){
-            fprintf(stdout, "\%5d \%5d \%5d   \%s\n",
+            fprintf(stderr, "\%5d \%5d \%5d   \%s\n",
                     count,
                     h->frequencies[count],
-                    h-> stats,
+                    h->stats[count],
                     h->keys[count]);
-        } /* else { */
-        /*     fprintf(stream,"\%5d \%5d \%5d   \%s",count,); */
-        /* } */
+        } else {
+            fprintf(stderr,"\%5d \%5d \%5d   \n",
+                    count,
+                    h->frequencies[count],
+                    h->stats[count]);
+         }
     }
 }
 
@@ -101,9 +125,9 @@ int htable_search(htable h, char *str) {
     int collisions = 0;
     unsigned int key = htable_word_to_int(str);
     unsigned int index = key % h->capacity;
-    unsigned int step = htable_step(h, key);
+    unsigned int step = (h->method == LINEAR_P) ? 1 :  htable_step(h, key);
 
-    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != h->capacity) {
+    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != (unsigned)h->capacity) {
         index = (index + step) % h->capacity;
         collisions++;
     }   
@@ -115,19 +139,7 @@ int htable_search(htable h, char *str) {
     return h->frequencies[index];
 }
 
-static unsigned int htable_word_to_int(char *word) {
-    unsigned int result = 0;
-    
-    while (*word != '\0') {
-        result = (*word++ + 31 * result);   
-    }
 
-    return result;
-}
-
-static unsigned int htable_step(htable h, unsigned int i_key) {
-    return 1 + (i_key % (h->capacity - 1));
-}
 
 /**
  * Prints out a line of data from the hash table to reflect the state
@@ -193,21 +205,3 @@ void htable_print_stats(htable h, FILE *stream, int num_stats) {
     }
     fprintf(stream, "------------------------------------------------------\n\n");
 }
-
-/*int main(void) {
-  htable h = htable_new(18143);
-  char word[256];
-    
-  int insertions = 0;
-  while (getword(word, sizeof word, stdin) != EOF) {
-  htable_insert(h, word);
-  insertions++;
-  }
-    
-  printf("Unique Keys: %d\n", h->num_keys);
-  int f = htable_search(h, "the");
-  printf("the: %d", f);
-  htable_free(h);
-    
-  return EXIT_SUCCESS;
-  }*/

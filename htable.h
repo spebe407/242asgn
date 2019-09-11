@@ -9,6 +9,5 @@ extern int htable_insert(htable h, char *str);
 extern htable htable_new(int capacity, hashing_t h_type);
 extern void htable_print(htable h, FILE *stream);
 extern int htable_search(htable h, char *str);
-static unsigned int htable_word_to_int(char* str);
-static unsigned int htable_step(htable h, unsigned int i_key);
+extern void htable_print_entire_table(htable h);
 #endif
