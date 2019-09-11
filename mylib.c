@@ -43,7 +43,7 @@ int getword(char *s, int limit, FILE *stream) {
 int is_prime(int x){
     int i = 2;
     for(i = 2;  i < x; i++){
-        if( x%i==0){
+        if(x % i == 0){
             return 0;
         }
     }
@@ -52,14 +52,9 @@ int is_prime(int x){
 
 int next_prime(int n) {
     int x = n;
-    int num_printed = 0;
-    while(num_printed > -1) {
-        if(is_prime(x)) {
-            printf(x);
-            num_printed++;
-            return x;
-        }
-         x++;
-        
+    if(is_prime(x)) {
+        return x;
     }
+    
+    return next_prime(x + 1);
 }

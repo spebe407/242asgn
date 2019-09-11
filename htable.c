@@ -48,9 +48,13 @@ int htable_insert(htable h, char *str) {
     unsigned int index = key % h->capacity;
     unsigned int step = (h->method == LINEAR_P) ? 1 : htable_step(h, key);
 
-    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != (unsigned)h->capacity) {
+    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0) {
         index = (index + step) % h->capacity;
         collisions++;
+
+        if(index == (key % h->capacity)) {
+            break;
+        }
     }
 
     if(h->keys[index] == NULL) {
@@ -83,6 +87,7 @@ htable htable_new(int capacity, hashing_t h_type) {
     for(i = 0; i < result->capacity; i++) {
         result->frequencies[i] = 0;
         result->keys[i] = NULL;
+        result->stats[i] = 0;
     }
 
     return result;
@@ -92,7 +97,7 @@ void htable_print(htable h, FILE *stream) {
     int i;
     for(i = 0; i < h->capacity; i++) {
         if(h->keys[i] != NULL) {
-            printf("%d %s\n", h->frequencies[i], h->keys[i]);
+            fprintf(stream, "%d %s\n", h->frequencies[i], h->keys[i]);
         }
     }
 }
@@ -105,13 +110,13 @@ void htable_print_entire_table(htable h) {
     fprintf(stderr, "----------------------------------------\n");
     for(count = 0; count < h-> capacity; count ++){
         if(h->keys [count] != NULL){
-            fprintf(stderr, "\%5d \%5d \%5d   \%s\n",
+            fprintf(stderr, "%5d %5d %5d   %s\n",
                     count,
                     h->frequencies[count],
                     h->stats[count],
                     h->keys[count]);
         } else {
-            fprintf(stderr,"\%5d \%5d \%5d   \n",
+            fprintf(stderr,"%5d %5d %5d   \n",
                     count,
                     h->frequencies[count],
                     h->stats[count]);
@@ -125,11 +130,15 @@ int htable_search(htable h, char *str) {
     int collisions = 0;
     unsigned int key = htable_word_to_int(str);
     unsigned int index = key % h->capacity;
-    unsigned int step = (h->method == LINEAR_P) ? 1 :  htable_step(h, key);
-
-    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0 && index != (unsigned)h->capacity) {
+    unsigned int step = (h->method == LINEAR_P) ? 1 : htable_step(h, key);
+    while(h->keys[index] != NULL && strcmp(str, h->keys[index]) != 0) {
         index = (index + step) % h->capacity;
         collisions++;
+
+        
+        if(index == (key % h->capacity)) {
+            break;
+        }
     }   
 
     if(collisions == h->capacity) {
@@ -138,8 +147,6 @@ int htable_search(htable h, char *str) {
 
     return h->frequencies[index];
 }
-
-
 
 /**
  * Prints out a line of data from the hash table to reflect the state

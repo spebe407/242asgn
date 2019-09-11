@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
                 snapshots = atoi(optarg);
                 break;
             case 't':
-                
+                table_size = next_prime(atoi(optarg));
                 break;
             case 'h':
                 h_flag = true;
@@ -79,9 +79,9 @@ int main(int argc, char* argv[]) {
         "-h           Display this message");
         return EXIT_SUCCESS;
     }
-    
-    dictionary = htable_new(table_size, hashing_method);
 
+    dictionary = htable_new(table_size, hashing_method);
+    
     start = clock();
     while(getword(word, sizeof(word), stdin) != EOF) {
         htable_insert(dictionary, word);
@@ -94,10 +94,10 @@ int main(int argc, char* argv[]) {
         htable_print_entire_table(dictionary);
     }
 
-    if(p_flag && s_flag) {
+    if(p_flag && s_flag && !c_flag) {
                                        /*stderr?*/ 
         htable_print_stats(dictionary, stdout, snapshots);
-    } else if(p_flag) {
+    } else if(p_flag && !c_flag) {
         htable_print_stats(dictionary, stdout, 10);
     }
    
